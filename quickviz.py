@@ -35,6 +35,12 @@ def buildArgsParser():
     p.add_argument('--his', dest='hist', action='store_true',
                             help='Flag to plot the Intensity Histogram')
 
+    p.add_argument('--min', dest='hist_min', type=int,
+                           help='Minimum threshold for histogram')
+
+    p.add_argument('--max', dest='hist_max', type=int,
+                           help='Maximum threshold for histogram')
+
     p.add_argument('--all', dest='plot_all', action='store_true',
                             help='Flag to plot all features')
     return p
@@ -156,9 +162,23 @@ def main():
     # Histogram
     if plot_histogram:
         nbins = 100
-        print('Histogram of whole volume with {} bins'.format(nbins))
         # enforcing mask
         data_hist = data[mask]
+
+        if args.hist_min is None:
+            hist_min = data_hist.min()
+        else:
+            hist_min = args.hist_min
+
+        if args.hist_max is None:
+            hist_max = data_hist.max()
+        else:
+            hist_max = args.hist_max
+
+        data_hist = data_hist[data_hist >= hist_min]
+        data_hist = data_hist[data_hist <= hist_max]
+
+        print('Histogram of masked volume with {} bins from {} to {}'.format(nbins, hist_min, hist_max))
         pl.figure()
         pl.hist(data_hist, bins = nbins)
 
