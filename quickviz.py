@@ -18,7 +18,10 @@ Ultra lightweight 3D data viewer with
 def buildArgsParser():
     p = argparse.ArgumentParser(description=DESCRIPTION)
     p.add_argument('input', action='store', type=str,
-                            help='Path of the  volume (nifti format)')
+                            help='Path of the volume (nifti format)')
+
+    p.add_argument('--mask', metavar='',
+                             help='Path to a binary mask (nifti format)')
 
     p.add_argument('--a', dest='mosaic_axis', type=int, default='0',
                           help='Data axis for mosaic plot.')
@@ -35,7 +38,6 @@ def buildArgsParser():
     p.add_argument('--all', dest='plot_all', action='store_true',
                             help='Flag to plot all features')
     return p
-
 
 
 
@@ -78,6 +80,14 @@ def main():
     # Casting data as float
     data = data.astype(np.float)
     print('Data shape is {}'.format(data.shape))
+
+    if args.mask is None:
+        mask = np.ones_like(data).astype(np.bool)
+    else:
+        mask = nib.load(args.mask).get_data().astype(np.bool)
+
+    # masking data
+    data = data*mask
 
 
     # Mosaic
@@ -141,8 +151,10 @@ def main():
     if plot_histogram:
         nbins = 100
         print('Histogram of whole volume with {} bins'.format(nbins))
+        # enforcing mask
+        data_hist = data[mask]
         pl.figure()
-        pl.hist(data.ravel(), bins = nbins)
+        pl.hist(data_hist, bins = nbins)
 
 
     pl.show()
