@@ -23,17 +23,17 @@ def buildArgsParser():
     p.add_argument('--mask', metavar='',
                              help='Path to a binary mask (nifti format)')
 
-    p.add_argument('--a', dest='mosaic_axis', type=int, default='0',
-                          help='Data axis for mosaic plot.')
+    p.add_argument('--ax', dest='mosaic_axis', type=int, default='0',
+                           help='Data axis for mosaic plot.')
 
-    p.add_argument('--m', dest='mosaic', action='store_true',
-                          help='Flag to plot the Slice Mosaic')
+    p.add_argument('--mos', dest='mosaic', action='store_true',
+                            help='Flag to plot the Slice Mosaic')
 
-    p.add_argument('--o', dest='ortho', action='store_true',
-                          help='Flag to plot the Orthoview')
+    p.add_argument('--ort', dest='ortho', action='store_true',
+                            help='Flag to plot the Orthoview')
 
-    p.add_argument('--i', dest='hist', action='store_true',
-                          help='Flag to plot the Intensity Histogram')
+    p.add_argument('--his', dest='hist', action='store_true',
+                            help='Flag to plot the Intensity Histogram')
 
     p.add_argument('--all', dest='plot_all', action='store_true',
                             help='Flag to plot all features')
@@ -131,20 +131,26 @@ def main():
 
         print('Data center is {} {} {}'.format(cx, cy, cz))
 
+        dataX = np.swapaxes(data[cx,:,::-1],0,1)
+        dataY = np.swapaxes(data[:,cy,::-1],0,1)
+        dataZ = np.swapaxes(data[:,::-1,cz],0,1)
+
+        datamin = min(dataX.min(), dataY.min(), dataZ.min())
+        datamax = min(dataX.max(), dataY.max(), dataZ.max())
+
+
         pl.figure()
         pl.subplot(1,3,1)
-        # pl.imshow(data[cx,:,:], interpolation='nearest', cmap = pl.cm.viridis)
-        pl.imshow(np.swapaxes(data[cx,:,::-1],0,1), interpolation='nearest', cmap = pl.cm.viridis)
-        pl.axis('off')
-        pl.subplot(1,3,2)
-        # pl.imshow(data[:,cy,:], interpolation='nearest', cmap = pl.cm.viridis)
-        pl.imshow(np.swapaxes(data[:,cy,::-1],0,1), interpolation='nearest', cmap = pl.cm.viridis)
-        pl.axis('off')
-        pl.subplot(1,3,3)
-        # pl.imshow(data[:,:,cz], interpolation='nearest', cmap = pl.cm.viridis)
-        pl.imshow(np.swapaxes(data[:,::-1,cz],0,1), interpolation='nearest', cmap = pl.cm.viridis)
+        pl.imshow(dataX, interpolation='nearest', cmap = pl.cm.viridis, vmin = datamin, vmax = datamax)
         pl.axis('off')
 
+        pl.subplot(1,3,2)
+        pl.imshow(dataY, interpolation='nearest', cmap = pl.cm.viridis, vmin = datamin, vmax = datamax)
+        pl.axis('off')
+
+        pl.subplot(1,3,3)
+        pl.imshow(dataZ, interpolation='nearest', cmap = pl.cm.viridis, vmin = datamin, vmax = datamax)
+        pl.axis('off')
 
 
     # Histogram
