@@ -183,7 +183,8 @@ def main():
         data_hist = data_hist[data_hist >= hist_min]
         data_hist = data_hist[data_hist <= hist_max]
 
-        print('Histogram of masked volume with {} bins from {} to {}'.format(nbins, hist_min, hist_max))
+        print('Histogram of masked volume with {} bins from {:.4f} to {:.4f}'.format(nbins, hist_min, hist_max))
+	print('mean = {:.4f}   std = {:.4f}'.format(data_hist.mean(), data_hist.std()))
         pl.figure()
         pl.hist(data_hist, bins = nbins)
 
