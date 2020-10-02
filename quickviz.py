@@ -35,14 +35,18 @@ def buildArgsParser():
     p.add_argument('--his', dest='hist', action='store_true',
                             help='Flag to plot the Intensity Histogram')
 
-    p.add_argument('--min', dest='hist_min', type=int,
+    p.add_argument('--min', dest='hist_min', type=float,
                            help='Minimum threshold for histogram')
 
-    p.add_argument('--max', dest='hist_max', type=int,
+    p.add_argument('--max', dest='hist_max', type=float,
                            help='Maximum threshold for histogram')
 
     p.add_argument('--all', dest='plot_all', action='store_true',
                             help='Flag to plot all features')
+
+    p.add_argument('--4d', dest='index_4d', type=int, default='0',
+                           help='Index for 4th dimension.')
+
     return p
 
 
@@ -65,6 +69,7 @@ def main():
         plot_orthoview = True
     if args.hist:
         plot_histogram = True
+    i4 = args.index_4d
 
     # enforcing 3D data
     datapath = args.input
@@ -73,11 +78,11 @@ def main():
         print('Data is less than 3D, terminating')
         return 0
     if data.ndim == 4:
-        print('Data is 4D, taking data[:,:,:,0]')
-        data = data[...,0]
+        print('Data is 4D, taking data[:,:,:,{}]'.format(i4))
+        data = data[...,i4]
     if data.ndim == 5:
-        print('Data is 5D, taking data[:,:,:,0,0]')
-        data = data[...,0,0]
+        print('Data is 5D, taking data[:,:,:,{},0]'.format(i4))
+        data = data[...,i4,0]
     if data.ndim > 5:
         print('Data is more than 5D, terminating')
         return 0
